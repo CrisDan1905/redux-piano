@@ -1,3 +1,5 @@
+import { type Point } from './types'
+
 export const clearCanvas = (canvas: HTMLCanvasElement): void => {
   const context = canvas.getContext('2d')
 
@@ -15,4 +17,22 @@ export const setCanvasSize = (canvas: HTMLCanvasElement, width: number, height: 
   canvas.style.width = `${width}px`
   canvas.style.height = `${height}px`
   canvas.getContext('2d')?.scale(2, 2)
+}
+
+export const drawStroke = (
+  context: CanvasRenderingContext2D,
+  points: Point[],
+  color: string
+): void => {
+  if (!points.length) {
+    return
+  }
+  context.strokeStyle = color
+  context.beginPath()
+  context.moveTo(points[0].x, points[0].y)
+  points.forEach(point => {
+    context.lineTo(point.x, point.y)
+    context.stroke()
+  })
+  context.closePath()
 }

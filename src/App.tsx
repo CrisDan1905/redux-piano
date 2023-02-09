@@ -1,17 +1,43 @@
-import type React from 'react'
 import { useEffect, useRef } from 'react'
-import './App.css'
-import { clearCanvas, setCanvasSize } from './utils/canvasUtils'
+import { useDispatch, useSelector } from 'react-redux'
+import { ColorPanel } from './shared/ColorPanel'
+import { EditPanel } from './shared/EditPanel'
+import { clearCanvas, drawStroke, setCanvasSize } from './utils/canvasUtils'
+import { beginStroke, endStroke, updateStroke } from './modules/currentStroke/actions'
+import { strokesSelector } from './modules/strokes/reducer'
+import { currentStrokeSelector } from './modules/currentStroke/reducer'
+import { historyIndexSelector } from './modules/historyIndex/reducer'
 
 const WIDTH = 1024
 const HEIGHT = 768
 
 function App (): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const currentStroke = useSelector(currentStrokeSelector)
+  const historyIndex = useSelector(historyIndexSelector)
+  const strokes = useSelector(strokesSelector)
 
   const getCanvasWithContext = (canvas = canvasRef.current): { canvas: HTMLCanvasElement | null, context: CanvasRenderingContext2D | null | undefined } => {
     return { canvas, context: canvas?.getContext('2d') }
   }
+
+  const isDrawing = !!currentStroke.points.length
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const { canvas, context } = getCanvasWithContext()
+
+    if (!context || !canvas) {
+      return
+    }
+    requestAnimationFrame(() => {
+      clearCanvas(canvas)
+
+      strokes
+        .slice(0, strokes.length - historyIndex)
+        .forEach(stroke => { drawStroke(context, stroke.points, stroke.color) })
+    })
+  }, [historyIndex])
 
   useEffect(() => {
     const { canvas, context } = getCanvasWithContext()
@@ -29,6 +55,34 @@ function App (): React.ReactElement {
     clearCanvas(canvas)
   }, [])
 
+  useEffect(() => {
+    const { context } = getCanvasWithContext()
+    if (!context) return
+
+    requestAnimationFrame(() => {
+      drawStroke(context, currentStroke.points, currentStroke.color)
+    })
+  }, [currentStroke])
+
+  const startDrawing = ({ nativeEvent }: React.MouseEvent<HTMLCanvasElement>): void => {
+    const { offsetX, offsetY } = nativeEvent
+    dispatch(beginStroke(offsetX, offsetY))
+  }
+
+  const draw = ({ nativeEvent }: React.MouseEvent<HTMLCanvasElement>): void => {
+    if (!isDrawing) {
+      return
+    }
+    const { offsetX, offsetY } = nativeEvent
+    dispatch(updateStroke(offsetX, offsetY))
+  }
+
+  const endDrawing = (): void => {
+    if (isDrawing) {
+      dispatch(endStroke(historyIndex, currentStroke))
+    }
+  }
+
   return (
     <div className='window'>
       <div className='title-bar'>
@@ -39,7 +93,15 @@ function App (): React.ReactElement {
           <button aria-label='Close' />
         </div>
       </div>
-      <canvas ref={canvasRef} />
+      <EditPanel />
+      <ColorPanel />
+      <canvas
+        ref={canvasRef}
+        onMouseDown={startDrawing}
+        onMouseUp={endDrawing}
+        onMouseOut={endDrawing}
+        onMouseMove={draw}
+      />
     </div>
   )
 }
