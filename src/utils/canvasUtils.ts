@@ -36,3 +36,12 @@ export const drawStroke = (
   })
   context.closePath()
 }
+
+export const getCanvasImage = async (canvas: HTMLCanvasElement | null): Promise<null | Blob> => {
+  return await new Promise((resolve, reject) => {
+    if (!canvas) {
+      reject(new Error('Canvas is not supported by this browser')); return
+    }
+    canvas.toBlob(resolve)
+  })
+}

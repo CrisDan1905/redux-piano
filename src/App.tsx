@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ColorPanel } from './shared/ColorPanel'
 import { EditPanel } from './shared/EditPanel'
@@ -7,12 +7,14 @@ import { beginStroke, endStroke, updateStroke } from './modules/currentStroke/ac
 import { strokesSelector } from './modules/strokes/reducer'
 import { currentStrokeSelector } from './modules/currentStroke/reducer'
 import { historyIndexSelector } from './modules/historyIndex/reducer'
+import { useCanvas } from './CanvasContext'
+import { FilePanel } from './shared/FilePanel'
 
 const WIDTH = 1024
 const HEIGHT = 768
 
 function App (): React.ReactElement {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef = useCanvas()
   const currentStroke = useSelector(currentStrokeSelector)
   const historyIndex = useSelector(historyIndexSelector)
   const strokes = useSelector(strokesSelector)
@@ -95,6 +97,7 @@ function App (): React.ReactElement {
       </div>
       <EditPanel />
       <ColorPanel />
+      <FilePanel />
       <canvas
         ref={canvasRef}
         onMouseDown={startDrawing}
