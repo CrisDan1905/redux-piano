@@ -1,7 +1,7 @@
 import logger from 'redux-logger'
-import { reducer as strokes } from './modules/strokes/reducer'
-import { reducer as currentStroke } from './modules/currentStroke/reducer'
-import { reducer as historyIndex } from './modules/historyIndex/reducer'
+import strokes from './modules/strokes/slice'
+import currentStroke from './modules/currentStroke/slice'
+import historyIndex from './modules/historyIndex/slice'
 import { configureStore } from '@reduxjs/toolkit'
 
 export const store = configureStore({
