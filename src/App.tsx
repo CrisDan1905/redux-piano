@@ -3,12 +3,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ColorPanel } from './shared/ColorPanel'
 import { EditPanel } from './shared/EditPanel'
 import { clearCanvas, drawStroke, setCanvasSize } from './utils/canvasUtils'
-import { beginStroke, endStroke, updateStroke } from './modules/currentStroke/actions'
+import { beginStroke, updateStroke } from './modules/currentStroke/actions'
 import { strokesSelector } from './modules/strokes/reducer'
 import { currentStrokeSelector } from './modules/currentStroke/reducer'
 import { historyIndexSelector } from './modules/historyIndex/reducer'
 import { useCanvas } from './CanvasContext'
 import { FilePanel } from './shared/FilePanel'
+import { endStroke } from './modules/sharedActions'
 
 const WIDTH = 1024
 const HEIGHT = 768
@@ -68,7 +69,7 @@ function App (): React.ReactElement {
 
   const startDrawing = ({ nativeEvent }: React.MouseEvent<HTMLCanvasElement>): void => {
     const { offsetX, offsetY } = nativeEvent
-    dispatch(beginStroke(offsetX, offsetY))
+    dispatch(beginStroke({ x: offsetX, y: offsetY }))
   }
 
   const draw = ({ nativeEvent }: React.MouseEvent<HTMLCanvasElement>): void => {
@@ -76,12 +77,12 @@ function App (): React.ReactElement {
       return
     }
     const { offsetX, offsetY } = nativeEvent
-    dispatch(updateStroke(offsetX, offsetY))
+    dispatch(updateStroke({ x: offsetX, y: offsetY }))
   }
 
   const endDrawing = (): void => {
     if (isDrawing) {
-      dispatch(endStroke(historyIndex, currentStroke))
+      dispatch(endStroke({ historyIndex, stroke: currentStroke }))
     }
   }
 
