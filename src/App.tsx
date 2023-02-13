@@ -9,6 +9,7 @@ import { historyIndexSelector } from './modules/historyIndex/slice'
 import { useCanvas } from './CanvasContext'
 import { FilePanel } from './shared/FilePanel'
 import { endStroke } from './modules/sharedActions'
+import { ModalLayer } from './ModalLayer'
 
 const WIDTH = 1024
 const HEIGHT = 768
@@ -98,6 +99,7 @@ function App (): React.ReactElement {
       <EditPanel />
       <ColorPanel />
       <FilePanel />
+      <ModalLayer />
       <canvas
         ref={canvasRef}
         onMouseDown={startDrawing}
