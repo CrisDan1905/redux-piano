@@ -5,13 +5,15 @@ import historyIndex from './modules/historyIndex/slice'
 import { type Action, configureStore, type ThunkAction } from '@reduxjs/toolkit'
 import { modalVisible } from './modules/modals/slice'
 import { type RootState } from './utils/types'
+import { projectsList } from './modules/projectsList/slice'
 
 export const store = configureStore({
   reducer: {
     historyIndex,
     currentStroke,
     strokes,
-    modalVisible
+    modalVisible,
+    projectsList
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger)
 })

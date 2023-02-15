@@ -1,9 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { type Stroke, type RootState } from '../../utils/types'
 import { endStroke } from '../sharedActions'
-import { newProject } from './api'
+import { getProject, newProject } from './api'
 
 const initialState: RootState['strokes'] = []
+
+export const loadProject = createAsyncThunk('LOAD_PROJECT', async (projectId: string) => {
+  try {
+    const { project } = await getProject(projectId)
+    return project.strokes
+  } catch (err) {
+    console.log(err)
+  }
+})
 
 type SaveProjectArg = {
   projectName: string
@@ -33,6 +42,9 @@ const strokes = createSlice({
       } else {
         state.splice(-historyIndex, historyIndex, stroke)
       }
+    })
+    builder.addCase(loadProject.fulfilled, (state, action) => {
+      return action.payload
     })
   }
 })

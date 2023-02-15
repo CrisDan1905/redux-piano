@@ -13,3 +13,6 @@ export const newProject = async (name: string, strokes: Stroke[], image: string)
       image
     })
   }).then(async res => await res.json())
+
+export const getProject = async (projectId: string): Promise<any> =>
+  await fetch(`http://localhost:4000/projects/${projectId}`).then(async res => await res.json())
